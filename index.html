@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Hash-veikkaus (tm)</title>
+<script>
+async function digestMessage(message) {
+	const msgUint8 = new TextEncoder().encode(message);                           // encode as (utf-8) Uint8Array
+	const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);           // hash the message
+	const hashArray = Array.from(new Uint8Array(hashBuffer));                     // convert buffer to byte array
+	const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join(''); // convert bytes to hex string
+	return hashHex;
+}
+
+async function calculate() {
+	console.log("Calculate");
+	const bet = document.getElementById("bet").value;
+	const password = document.getElementById("password").value;
+	let timestamp = document.getElementById("timestamp").value;
+	if (!timestamp) {
+		timestamp = Date.now();
+	}
+
+	const payload = bet + password + timestamp;
+
+	document.getElementById("payload").value = payload;
+
+	document.getElementById("hash").value = await digestMessage(payload);
+}
+
+</script>
+</head>
+<body>
+<h1>Hash-veikkaus (tm)</h1>
+<p>Veikkaus: <input id="bet"></p>
+<p>Salasana: <input id="password"></p>
+<p>Aikaleima (vain tarkistusta varten): <input id="timestamp"></p>
+<p><button onclick="calculate()">Laske hash</button></p>
+
+<p>Hash (kerro tämä muille):<br><input id="hash" style="width: 500px;"></p>
+
+<p>Syöte (laita talteen, mutta älä kerro tätä vielä muille:)<br>
+<input id="payload" style="width: 500px;"></p>
+
+<h2>Ohje osallistumiseen</h2>
+<ol>
+	<li>Syötä <i>Veikkaus</i> ja <i>Salasana</i> ja paina <i>Laske Hash</i></li>
+	<li>Kopioi ja liitä <i>Hash</i> slack-kanavalle</li>
+	<li>Tallenna <i>Syöte</i> itsellesi varmaan paikkaan, mutta älä kerro sitä muille</li>
+</ol>
+<h2>Ohje tarkistamiseen</h2>
+<ol>
+	<li>Syötä kaverin antamat <i>Veikkaus</i>, <i>Salasana</i> ja <i>Aikaleima</i></li>
+	<li>Paina <i>Laske hash</i></li>
+	<li>Tsekkaa että <i>Hash</i> täsmää kaverin aiemmin postaamaan hashiin</li>
+</ol>
+
+</body>
+</html>
